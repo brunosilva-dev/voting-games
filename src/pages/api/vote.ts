@@ -24,7 +24,7 @@ export default async function handler(
 
     try {
       await pool.query(
-        `INSERT INTO votes (photo_id, photo_alt, votes, created_at) VALUES ($1, $2, $3, NOW())`,
+        `INSERT INTO public.votes (photo_id, photo_alt, votes, created_at) VALUES ($1, $2, $3, NOW())`,
         [photoId, photoAlt, 1]
       );
       res.status(200).json({ message: "Voto registrado com sucesso!" });
