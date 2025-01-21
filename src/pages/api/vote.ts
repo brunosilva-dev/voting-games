@@ -93,7 +93,7 @@ export default async function handler(
       );
       res.status(200).json({ message: "Voto registrado com sucesso!" });
     } catch (error) {
-      console.error("Erro ao registrar voto:", error);
+      console.error("Erro ao registrar voto: ", error);
       res.status(500).json({ message: "Erro ao registrar o voto." });
     }
   } else {
