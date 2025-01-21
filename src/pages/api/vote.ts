@@ -36,6 +36,7 @@
 //     res.setHeader("Allow", ["POST"]);
 //     res.status(405).json({ message: `Método ${req.method} não permitido.` });
 //   }
+//
 // }
 
 import dotenv from "dotenv";
