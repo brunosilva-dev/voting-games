@@ -39,7 +39,7 @@ const Page: React.FC = () => {
       newVotes[selectedPhoto - 1] += 1; // Adiciona 1 voto à foto selecionada
       setVotes(newVotes);
 
-      alert(`Você votou no jogo: ${photos[selectedPhoto - 1].alt}`);
+      alert(`Você votou no jogo - ${photos[selectedPhoto - 1].alt}`);
     } else {
       alert("Por favor, selecione uma foto antes de votar!");
     }
