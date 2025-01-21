@@ -1,5 +1,7 @@
+import dotenv from "dotenv";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Pool } from "pg";
+dotenv.config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL, // A URL do banco de dados deve estar no arquivo .env
