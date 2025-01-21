@@ -57,9 +57,9 @@ const pool = new Pool({
 const getUserIp = (req: IncomingMessage): string => {
   const xForwardedFor = req.headers["x-forwarded-for"];
   if (typeof xForwardedFor === "string") {
-    return xForwardedFor.split(",")[0]; // Retorna o primeiro IP caso seja um proxy
+    return xForwardedFor.split(",")[0].trim(); // Garante que o IP seja tratado corretamente
   }
-  return req.connection.remoteAddress || ""; // Caso contrário, pega o endereço direto
+  return req.socket.remoteAddress || "IP_DESCONHECIDO"; // Fallback para IP desconhecido
 };
 
 export default async function handler(
