@@ -6,29 +6,30 @@
 
 // const Page: React.FC = () => {
 //   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
-//   const [isVoting, setIsVoting] = useState(false); // Para desativar o botão enquanto vota
+//   const [isVoting, setIsVoting] = useState(false);
 //   const [votes, setVotes] = useState<number[]>(new Array(10).fill(0));
+//   const [hasVoted, setHasVoted] = useState(false); // Controle do estado de voto
 
-// const photos = [
-//   { id: 1, src: "/assets/cold-war.jpeg", alt: "Call Of Duty Cold War" },
-//   { id: 2, src: "/assets/dredge.jpeg", alt: "Dredge" },
-//   {
-//     id: 3,
-//     src: "/assets/kingdom-come-deliverance.jpeg",
-//     alt: "Kingdom Come Deliverance",
-//   },
-//   { id: 4, src: "/assets/little-nightmare.jpg", alt: "Little Nightmare" },
-//   { id: 5, src: "/assets/mafia-2.jpg", alt: "Mafia 2" },
-//   {
-//     id: 6,
-//     src: "/assets/murdered-soul-suspect.jpeg",
-//     alt: "Murdered Soul Suspect",
-//   },
-//   { id: 7, src: "/assets/sinking-city.jpeg", alt: "The Sinking City" },
-//   { id: 8, src: "/assets/the last of us.jpg", alt: "The Last Of Us" },
-//   { id: 9, src: "/assets/the-witcher-3.jpeg", alt: "The Witcher 3" },
-//   { id: 10, src: "/assets/twin-mirror.jpg", alt: "The Mirror" },
-// ];
+//   const photos = [
+//     { id: 1, src: "/assets/cold-war.jpeg", alt: "Call Of Duty Cold War" },
+//     { id: 2, src: "/assets/dredge.jpeg", alt: "Dredge" },
+//     {
+//       id: 3,
+//       src: "/assets/kingdom-come-deliverance.jpeg",
+//       alt: "Kingdom Come Deliverance",
+//     },
+//     { id: 4, src: "/assets/little-nightmare.jpg", alt: "Little Nightmare" },
+//     { id: 5, src: "/assets/mafia-2.jpg", alt: "Mafia 2" },
+//     {
+//       id: 6,
+//       src: "/assets/murdered-soul-suspect.jpeg",
+//       alt: "Murdered Soul Suspect",
+//     },
+//     { id: 7, src: "/assets/sinking-city.jpeg", alt: "The Sinking City" },
+//     { id: 8, src: "/assets/the last of us.jpg", alt: "The Last Of Us" },
+//     { id: 9, src: "/assets/the-witcher-3.jpeg", alt: "The Witcher 3" },
+//     { id: 10, src: "/assets/twin-mirror.jpg", alt: "The Mirror" },
+//   ];
 
 //   const handleVote = async () => {
 //     if (selectedPhoto === null) {
@@ -36,7 +37,7 @@
 //       return;
 //     }
 
-//     setIsVoting(true); // Desativa o botão enquanto processa
+//     setIsVoting(true);
 
 //     try {
 //       const response = await fetch("/api/vote", {
@@ -48,21 +49,26 @@
 //         }),
 //       });
 
+//       const result = await response.json();
+
 //       if (!response.ok) {
-//         throw new Error("Erro ao salvar o voto.");
+//         throw new Error(result.message || "Erro ao registrar o voto.");
 //       }
 
-//       // Atualiza localmente os votos
-//       const newVotes = [...votes];
-//       newVotes[selectedPhoto - 1] += 1;
-//       setVotes(newVotes);
-
-//       alert(`Você votou no jogo - ${photos[selectedPhoto - 1].alt}`);
+//       if (result.message.includes("já votou")) {
+//         alert(result.message);
+//       } else {
+//         setHasVoted(true);
+//         const newVotes = [...votes];
+//         newVotes[selectedPhoto - 1] += 1;
+//         setVotes(newVotes);
+//         alert(`Você votou no jogo - ${photos[selectedPhoto - 1].alt}`);
+//       }
 //     } catch (error) {
 //       console.error(error);
 //       alert("Erro ao registrar o voto. Tente novamente.");
 //     } finally {
-//       setIsVoting(false); // Reativa o botão
+//       setIsVoting(false);
 //     }
 //   };
 
@@ -72,7 +78,11 @@
 //     <div className={styles.app}>
 //       <header className={styles.header}>
 //         <h1>Qual jogo gostaria de ver em live?</h1>
-//         <p>Você tem 1 voto disponível</p>
+//         <p>
+//           {hasVoted
+//             ? "Você já votou! Não é mais possível votar novamente."
+//             : "Você tem 1 voto disponível"}
+//         </p>
 //       </header>
 //       <main className={styles.gallery}>
 //         {photos.map((photo, index) => {
@@ -113,7 +123,7 @@
 //         <button
 //           onClick={handleVote}
 //           className={styles.voteButton}
-//           disabled={isVoting}
+//           disabled={isVoting || hasVoted}
 //         >
 //           {isVoting ? "Enviando..." : "Vote"}
 //         </button>
@@ -126,7 +136,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import Image from "next/image";
 
@@ -135,6 +145,7 @@ const Page: React.FC = () => {
   const [isVoting, setIsVoting] = useState(false);
   const [votes, setVotes] = useState<number[]>(new Array(10).fill(0));
   const [hasVoted, setHasVoted] = useState(false); // Controle do estado de voto
+  // const [photosVotes, setPhotosVotes] = useState<any[]>([]); // Estado para armazenar votos
 
   const photos = [
     { id: 1, src: "/assets/cold-war.jpeg", alt: "Call Of Duty Cold War" },
@@ -156,6 +167,36 @@ const Page: React.FC = () => {
     { id: 9, src: "/assets/the-witcher-3.jpeg", alt: "The Witcher 3" },
     { id: 10, src: "/assets/twin-mirror.jpg", alt: "The Mirror" },
   ];
+
+  useEffect(() => {
+    // Função para buscar os votos quando o componente for montado
+    const fetchVotes = async () => {
+      try {
+        const response = await fetch("/api/vote");
+        const result = await response.json();
+
+        if (response.ok) {
+          // Mapeia os votos no formato que a interface espera
+          const updatedVotes = new Array(10).fill(0);
+          result.forEach((vote: any) => {
+            const index = photos.findIndex(
+              (photo) => photo.id === vote.photo_id
+            );
+            if (index !== -1) {
+              updatedVotes[index] = parseInt(vote.votes);
+            }
+          });
+          setVotes(updatedVotes);
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar os votos: ", error);
+      }
+    };
+
+    fetchVotes();
+  }, []);
 
   const handleVote = async () => {
     if (selectedPhoto === null) {
