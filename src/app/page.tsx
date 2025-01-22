@@ -176,11 +176,11 @@ const Page: React.FC = () => {
     const fetchVotes = async () => {
       try {
         const response = await fetch("/api/vote");
-        const result = await response.json();
+        const result: Vote[] = await response.json(); // Tipando como array de Vote
 
         if (response.ok) {
           const updatedVotes = new Array(10).fill(0);
-          result.forEach((vote: any) => {
+          result.forEach((vote) => {
             const index = photos.findIndex(
               (photo) => photo.id === vote.photo_id
             );
@@ -190,7 +190,7 @@ const Page: React.FC = () => {
           });
           setVotes(updatedVotes);
         } else {
-          throw new Error(result.message);
+          throw new Error("Erro ao carregar os votos.");
         }
       } catch (error) {
         console.error("Erro ao carregar os votos: ", error);
@@ -198,7 +198,7 @@ const Page: React.FC = () => {
     };
 
     fetchVotes();
-  }, []); // Agora não há dependência de photos, ele executa apenas uma vez
+  }, []); // A dependência continua sendo vazia
 
   const handleVote = async () => {
     if (selectedPhoto === null) {
