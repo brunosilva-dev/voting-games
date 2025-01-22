@@ -121,12 +121,18 @@ export default async function handler(
     }
   }
   // Endpoint para retornar os votos
+  // Endpoint para retornar os votos
   else if (req.method === "GET") {
     try {
       // Pega todos os votos por foto
       const result = await pool.query(
         `SELECT photo_id, photo_alt, COUNT(*) as votes FROM public.votes GROUP BY photo_id, photo_alt`
       );
+
+      // Defina os cabeçalhos para desabilitar o cache
+      res.setHeader("Cache-Control", "no-store"); // Impede cache no navegador
+      res.setHeader("Pragma", "no-cache"); // Para compatibilidade com versões antigas do HTTP
+      res.setHeader("Expires", "0"); // Define a expiração como 0, garantindo que o conteúdo seja sempre fresco
 
       // Retorna os resultados
       res.status(200).json(result.rows);

@@ -140,12 +140,16 @@ import React, { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import Image from "next/image";
 
+interface Vote {
+  photo_id: number;
+  votes: number;
+}
+
 const Page: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   const [votes, setVotes] = useState<number[]>(new Array(10).fill(0));
   const [hasVoted, setHasVoted] = useState(false); // Controle do estado de voto
-  // const [photosVotes, setPhotosVotes] = useState<any[]>([]); // Estado para armazenar votos
 
   const photos = [
     { id: 1, src: "/assets/cold-war.jpeg", alt: "Call Of Duty Cold War" },
@@ -169,21 +173,19 @@ const Page: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Função para buscar os votos quando o componente for montado
     const fetchVotes = async () => {
       try {
         const response = await fetch("/api/vote");
         const result = await response.json();
 
         if (response.ok) {
-          // Mapeia os votos no formato que a interface espera
           const updatedVotes = new Array(10).fill(0);
           result.forEach((vote: any) => {
             const index = photos.findIndex(
               (photo) => photo.id === vote.photo_id
             );
             if (index !== -1) {
-              updatedVotes[index] = parseInt(vote.votes);
+              updatedVotes[index] = Number(vote.votes);
             }
           });
           setVotes(updatedVotes);
@@ -196,7 +198,7 @@ const Page: React.FC = () => {
     };
 
     fetchVotes();
-  }, []);
+  }, []); // Agora não há dependência de photos, ele executa apenas uma vez
 
   const handleVote = async () => {
     if (selectedPhoto === null) {
