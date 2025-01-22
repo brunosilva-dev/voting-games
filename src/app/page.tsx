@@ -222,15 +222,25 @@ const Page: React.FC = () => {
               }`}
               onClick={() => setSelectedPhoto(photo.id)}
             >
-              <Image src={photo.src} alt={photo.alt} width={150} height={150} />
-              <p>{photo.alt}</p>
-              <p>
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                width={150}
+                height={150}
+                className="photo"
+              />
+              <div className={styles.photoTextContainer}>
+                <p>{photo.alt}</p>
+              </div>
+              <p className={styles.percentual}>
                 {Math.round(votePercentage)}% - {votes[index]} votos
               </p>
-              <div
-                className={styles.voteBar}
-                style={{ width: `${votePercentage}%` }}
-              ></div>
+              <div className={styles.voteBarContainer}>
+                <div
+                  className={styles.voteBar}
+                  style={{ width: `${votePercentage}%` }}
+                ></div>
+              </div>
             </div>
           );
         })}
